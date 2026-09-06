@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/zip"
+	"bytes"
 	"crypto/ed25519"
 	"crypto/sha256"
 	"encoding/base64"
@@ -244,6 +245,10 @@ func readCurrent(root string) (currentFile, error) {
 	if err != nil {
 		return currentFile{}, err
 	}
+	// Windows PowerShell 5.1 writes a UTF-8 BOM when using
+	// Set-Content -Encoding utf8. Accept existing portable packages that were
+	// produced that way, while new builds always write UTF-8 without a BOM.
+	data = bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF})
 	var current currentFile
 	if err := json.Unmarshal(data, &current); err != nil {
 		return currentFile{}, err

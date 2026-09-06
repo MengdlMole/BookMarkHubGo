@@ -2,6 +2,7 @@ param([string]$Version = "0.1.0")
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $Dist = Join-Path $Root "dist"
+$Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 if (-not (Get-Command go -ErrorAction SilentlyContinue)) { throw "Go 1.23 or newer is required" }
 Remove-Item $Dist -Recurse -Force -ErrorAction SilentlyContinue
 New-Item $Dist -ItemType Directory | Out-Null
@@ -18,7 +19,8 @@ try {
     $env:CGO_ENABLED = "0"; $env:GOOS = $GoOS; $env:GOARCH = $GoArch
     go build -trimpath -ldflags="-s -w -X main.version=$Version" -o (Join-Path $Package "versions/$Version/$Core") ./cmd/bookmarkhub-core
     go build -trimpath -ldflags="-s -w" -o (Join-Path $Package $Launcher) ./cmd/bookmarkhub-launcher
-    @{ version = $Version } | ConvertTo-Json | Set-Content (Join-Path $Package "current.json") -Encoding utf8
+    $CurrentJson = @{ version = $Version } | ConvertTo-Json
+    [System.IO.File]::WriteAllText((Join-Path $Package "current.json"), $CurrentJson + [Environment]::NewLine, $Utf8NoBom)
     Compress-Archive -Path $Package -DestinationPath "$Package.zip"
   }
   $ExtensionPackage = Join-Path $Dist "bookmarkhub-extension-$Version"
