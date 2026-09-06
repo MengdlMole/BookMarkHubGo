@@ -1,0 +1,6 @@
+/dist/
+/config/
+/data/
+*.tmp
+*.installing
+

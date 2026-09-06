@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>BookmarkHub</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>.grow{flex:1}</style>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="logo">B</span><div><strong>BookmarkHub</strong><small id="connection">正在连接本地服务…</small></div></div>
+    <div class="header-actions">
+      <button id="importButton">导入</button>
+      <button id="exportHtml">导出 HTML</button>
+      <button id="exportXbel">导出 XBEL</button>
+      <button id="settingsButton">设置</button>
+    </div>
+  </header>
+
+  <div class="search"><span>⌕</span><input id="search" placeholder="搜索标题、网址、标签、备注或分组…" autocomplete="off"><kbd>Ctrl K</kbd></div>
+
+  <div class="layout">
+    <aside>
+      <section>
+        <div class="section-title"><span>分组</span><button id="newGroup" title="新建分组">＋</button></div>
+        <nav id="groups"></nav>
+      </section>
+      <section>
+        <div class="section-title"><span>标签</span><button id="clearTag" hidden>清除</button></div>
+        <div id="tags" class="tag-cloud"></div>
+      </section>
+    </aside>
+
+    <main>
+      <div class="content-head">
+        <div><h1 id="viewTitle">全部书签</h1><p id="resultMeta"></p></div>
+        <div class="content-actions"><select id="sort"><option value="recent">最近更新</option><option value="title">标题 A–Z</option><option value="domain">网站域名</option></select><button class="primary" id="newBookmark">＋ 添加书签</button></div>
+      </div>
+      <div id="activeFilters"></div>
+      <section id="list" class="bookmark-grid"></section>
+    </main>
+  </div>
+
+  <dialog id="bookmarkDialog"><form id="bookmarkForm" method="dialog">
+    <div class="dialog-head"><h2>书签</h2><button type="button" data-close="bookmarkDialog">×</button></div>
+    <input name="id" type="hidden">
+    <label>标题<input name="title" required></label>
+    <label>网址<input name="url" type="url" required placeholder="https://"></label>
+    <label>分组路径<input name="groupPath" list="groupPaths" placeholder="例如：技术/编程/Go"></label>
+    <datalist id="groupPaths"></datalist>
+    <label>标签<input name="tagsText" list="tagNames" placeholder="教程, 待读"></label>
+    <datalist id="tagNames"></datalist>
+    <label>备注<textarea name="notes" rows="4"></textarea></label>
+    <div class="dialog-actions"><button type="button" data-close="bookmarkDialog">取消</button><button class="primary">保存</button></div>
+  </form></dialog>
+
+  <dialog id="groupDialog"><form id="groupForm" method="dialog">
+    <div class="dialog-head"><h2>分组</h2><button type="button" data-close="groupDialog">×</button></div>
+    <input name="id" type="hidden"><input name="parentId" type="hidden">
+    <label>名称<input name="name" required></label>
+    <label>父分组<select name="parentSelect"></select></label>
+    <div class="dialog-actions"><button type="button" id="deleteGroup" class="danger" hidden>删除分组</button><span class="grow"></span><button type="button" data-close="groupDialog">取消</button><button class="primary">保存</button></div>
+  </form></dialog>
+
+  <dialog id="settingsDialog"><form id="settingsForm" method="dialog">
+    <div class="dialog-head"><h2>本地与同步</h2><button type="button" data-close="settingsDialog">×</button></div>
+    <label>同步目录<input name="syncDir" required></label>
+    <p class="hint">请选择坚果云、Syncthing 或其他云盘中的本地同步目录。</p>
+    <label>扩展配对令牌<div class="copy-row"><input name="token" readonly><button type="button" id="copyToken">复制</button></div></label>
+    <label>本设备文件<input name="deviceFile" readonly></label>
+    <div class="dialog-actions"><button type="button" data-close="settingsDialog">取消</button><button class="primary">保存目录</button></div>
+  </form></dialog>
+
+  <dialog id="importDialog"><form id="importForm" method="dialog">
+    <div class="dialog-head"><h2>导入书签</h2><button type="button" data-close="importDialog">×</button></div>
+    <label>文件<input name="file" type="file" accept=".html,.htm,.xbel,.xml" required></label>
+    <label>导入方式<select name="mode"><option value="merge">合并并按 URL 去重</option><option value="replace">替换当前书签</option></select></label>
+    <p class="hint">替换前会在同步目录的 backups 文件夹保留旧版本。</p>
+    <div class="dialog-actions"><button type="button" data-close="importDialog">取消</button><button class="primary">导入</button></div>
+  </form></dialog>
+
+  <div id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

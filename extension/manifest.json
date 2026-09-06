@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "BookmarkHub Companion",
+  "version": "0.1.0",
+  "description": "将 Chrome 和 Edge 当前页面保存到本地 BookmarkHub。",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["http://127.0.0.1:17836/*"],
+  "action": {
+    "default_title": "保存到 BookmarkHub",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "open-bookmarkhub": {
+      "suggested_key": {
+        "default": "Alt+Shift+B",
+        "mac": "Alt+Shift+B"
+      },
+      "description": "打开 BookmarkHub 收藏弹窗"
+    }
+  }
+}
