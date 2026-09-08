@@ -36,6 +36,7 @@ type Bookmark struct {
 	GroupID   string   `json:"groupId,omitempty"`
 	Tags      []string `json:"tags,omitempty"`
 	Notes     string   `json:"notes,omitempty"`
+	Starred   bool     `json:"starred,omitempty"`
 	CreatedAt string   `json:"createdAt"`
 	UpdatedAt string   `json:"updatedAt"`
 	Revision  string   `json:"revision"`

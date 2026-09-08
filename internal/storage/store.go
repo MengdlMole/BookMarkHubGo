@@ -39,6 +39,7 @@ type BookmarkInput struct {
 	GroupPath string   `json:"groupPath"`
 	Tags      []string `json:"tags"`
 	Notes     string   `json:"notes"`
+	Starred   *bool    `json:"starred,omitempty"`
 }
 
 type GroupInput struct {
@@ -192,6 +193,9 @@ func (s *Store) UpsertBookmark(input BookmarkInput) (model.Bookmark, error) {
 	now := time.Now().UTC().Format(time.RFC3339)
 	state.Counter++
 	bookmark := model.Bookmark{ID: input.ID, URL: input.URL, Title: strings.TrimSpace(input.Title), GroupID: groupID, Tags: model.NormalizeTags(input.Tags), Notes: strings.TrimSpace(input.Notes), UpdatedAt: now, Revision: model.Revision{Counter: state.Counter, DeviceID: s.settings.DeviceID}.String()}
+	if input.Starred != nil {
+		bookmark.Starred = *input.Starred
+	}
 	if bookmark.ID == "" {
 		bookmark.ID = model.NewID("b")
 	}
@@ -201,6 +205,9 @@ func (s *Store) UpsertBookmark(input BookmarkInput) (model.Bookmark, error) {
 	if index >= 0 {
 		bookmark.ID = state.Bookmarks[index].ID
 		bookmark.CreatedAt = state.Bookmarks[index].CreatedAt
+		if input.Starred == nil {
+			bookmark.Starred = state.Bookmarks[index].Starred
+		}
 		state.Bookmarks[index] = bookmark
 	} else {
 		bookmark.CreatedAt = now
@@ -210,6 +217,21 @@ func (s *Store) UpsertBookmark(input BookmarkInput) (model.Bookmark, error) {
 		return model.Bookmark{}, err
 	}
 	return bookmark, nil
+}
+
+func (s *Store) SetBookmarkStar(id string, starred bool) error {
+	return s.mutate(func(state *model.State) error {
+		for i := range state.Bookmarks {
+			if state.Bookmarks[i].ID == id && !state.Bookmarks[i].Deleted {
+				state.Counter++
+				state.Bookmarks[i].Starred = starred
+				state.Bookmarks[i].UpdatedAt = time.Now().UTC().Format(time.RFC3339)
+				state.Bookmarks[i].Revision = model.Revision{Counter: state.Counter, DeviceID: s.settings.DeviceID}.String()
+				return nil
+			}
+		}
+		return os.ErrNotExist
+	})
 }
 
 func (s *Store) DeleteBookmark(id string) error {

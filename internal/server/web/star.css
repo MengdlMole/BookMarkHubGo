@@ -1,0 +1,25 @@
+.star-button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 21px;
+  line-height: 1;
+  padding: 2px 5px;
+}
+
+.star-button:hover,
+.star-button.active {
+  border: 0;
+  background: transparent;
+  color: #e5a400;
+}
+
+.checkbox-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-label input {
+  width: auto;
+}

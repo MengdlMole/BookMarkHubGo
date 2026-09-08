@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>BookmarkHub</title><link rel="stylesheet" href="popup.css"></head><body>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>BookmarkHub</title><link rel="stylesheet" href="popup.css"><link rel="stylesheet" href="star.css"></head><body>
 <header><div><strong>BookmarkHub</strong><small id="state">正在连接…</small></div><button id="manager">管理</button></header>
 <section id="pairing" hidden><p>请先启动 BookmarkHub Core，在管理页“设置”中复制配对令牌。</p><label>配对令牌<input id="token" autocomplete="off"></label><button id="pair" class="primary">连接</button></section>
 <form id="bookmarkForm" hidden>
@@ -8,6 +8,7 @@
   <label>分组路径<input name="groupPath" list="groups" placeholder="技术/编程/Go"></label><datalist id="groups"></datalist>
   <label>标签<input name="tagsText" list="tags" placeholder="教程, 待读"></label><datalist id="tags"></datalist>
   <label>备注<textarea name="notes" rows="3"></textarea></label>
+  <label class="checkbox-label"><input name="starred" type="checkbox"> 星标书签</label>
   <button class="primary save">保存书签</button>
 </form>
 <div id="message"></div><script src="popup.js"></script></body></html>

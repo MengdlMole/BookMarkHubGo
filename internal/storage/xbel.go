@@ -39,8 +39,8 @@ func writeXBELLevel(out *bytes.Buffer, state model.State, parentID string, depth
 		if bookmark.Notes != "" {
 			out.WriteString(indent + "  <desc>" + xmlEscape(bookmark.Notes) + "</desc>\n")
 		}
-		if len(bookmark.Tags) > 0 {
-			out.WriteString(indent + "  <info><metadata owner=\"urn:bookmarkhub:xbel\" tags=\"" + xmlEscape(strings.Join(bookmark.Tags, ",")) + "\"/></info>\n")
+		if len(bookmark.Tags) > 0 || bookmark.Starred {
+			out.WriteString(indent + "  <info><metadata owner=\"urn:bookmarkhub:xbel\" tags=\"" + xmlEscape(strings.Join(bookmark.Tags, ",")) + "\" starred=\"" + fmt.Sprintf("%t", bookmark.Starred) + "\"/></info>\n")
 		}
 		out.WriteString(indent + "</bookmark>\n")
 	}
@@ -93,8 +93,11 @@ func DecodeXBEL(content []byte) (model.State, error) {
 				captureName = name
 				captureText.Reset()
 			case "metadata":
-				if currentBookmark != nil && attrs["tags"] != "" {
-					currentBookmark.Tags = model.NormalizeTags([]string{attrs["tags"]})
+				if currentBookmark != nil {
+					if attrs["tags"] != "" {
+						currentBookmark.Tags = model.NormalizeTags([]string{attrs["tags"]})
+					}
+					currentBookmark.Starred = attrs["starred"] == "true" || attrs["starred"] == "1"
 				}
 			}
 		case xml.CharData:

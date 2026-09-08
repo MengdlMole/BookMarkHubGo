@@ -40,6 +40,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("GET /api/v1/status", s.status)
 	s.mux.HandleFunc("GET /api/v1/state", s.state)
 	s.mux.HandleFunc("POST /api/v1/bookmarks", s.upsertBookmark)
+	s.mux.HandleFunc("POST /api/v1/bookmarks/star", s.starBookmark)
 	s.mux.HandleFunc("POST /api/v1/bookmarks/delete", s.deleteBookmark)
 	s.mux.HandleFunc("POST /api/v1/groups", s.upsertGroup)
 	s.mux.HandleFunc("POST /api/v1/groups/delete", s.deleteGroup)
@@ -48,6 +49,22 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("POST /api/v1/settings/sync-dir", s.setSyncDir)
 	root, _ := fs.Sub(webFiles, "web")
 	s.mux.Handle("/", http.FileServer(http.FS(root)))
+}
+
+func (s *Server) starBookmark(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		ID      string `json:"id"`
+		Starred bool   `json:"starred"`
+	}
+	if err := readJSON(r, &input); err != nil {
+		writeError(w, err)
+		return
+	}
+	if err := s.store.SetBookmarkStar(input.ID, input.Starred); err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
 }
 
 func (s *Server) security(next http.Handler) http.Handler {

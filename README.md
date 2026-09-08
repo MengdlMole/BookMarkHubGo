@@ -9,7 +9,9 @@ BookmarkHubGo 是一个全新的、本地优先的跨平台书签项目，不依
 - Chrome 和 Edge 共用一套 Manifest V3 扩展
 - 保存或更新当前页面，Core 离线时在扩展中排队
 - 任意层级分组、分组重命名和删除
-- 标签、备注、搜索、分组/标签筛选和排序
+- 分组树逐级展开和折叠，并记忆折叠状态
+- 书签卡片视图和列表视图切换，并记忆视图偏好
+- 标签、备注、星标、搜索、分组/标签/星标筛选和排序
 - Netscape Bookmark HTML 导入和导出
 - XBEL 1.0 导入和导出
 - 每台设备使用独立 HTML 文件，支持坚果云等文件同步工具
@@ -102,7 +104,7 @@ bookmarkhub-windows-<device-id>.html
 bookmarkhub-linux-<device-id>.html
 ```
 
-文件是可被 Chrome 和 Edge识别的 Netscape Bookmark HTML。分组使用嵌套的 `H3/DL`，标签使用 `TAGS`，备注使用 `DD`。BookmarkHub 的 UUID、修订号和删除墓碑保存在标准 HTML 可忽略的自定义属性及 Base64 JSON 注释中。
+文件是可被 Chrome 和 Edge识别的 Netscape Bookmark HTML。分组使用嵌套的 `H3/DL`，标签使用 `TAGS`，备注使用 `DD`。星标、BookmarkHub 的 UUID、修订号和删除墓碑保存在标准 HTML 可忽略的自定义属性及 Base64 JSON 注释中；XBEL 导入导出同样保留星标。
 
 不要让两个复制出来的 Core 配置共享相同 `deviceId`。将程序复制到新设备时，应删除新副本的 `config/settings.json`，让它生成新的设备 ID。
 

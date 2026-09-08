@@ -6,6 +6,8 @@
   <meta name="color-scheme" content="light dark">
   <title>BookmarkHub</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/views.css">
+  <link rel="stylesheet" href="/star.css">
   <style>.grow{flex:1}</style>
 </head>
 <body>
@@ -36,7 +38,14 @@
     <main>
       <div class="content-head">
         <div><h1 id="viewTitle">全部书签</h1><p id="resultMeta"></p></div>
-        <div class="content-actions"><select id="sort"><option value="recent">最近更新</option><option value="title">标题 A–Z</option><option value="domain">网站域名</option></select><button class="primary" id="newBookmark">＋ 添加书签</button></div>
+        <div class="content-actions">
+          <div class="view-switch" role="group" aria-label="书签视图">
+            <button type="button" data-view="card" title="卡片视图">▦ 卡片</button>
+            <button type="button" data-view="list" title="列表视图">☷ 列表</button>
+          </div>
+          <select id="sort"><option value="recent">最近更新</option><option value="title">标题 A–Z</option><option value="domain">网站域名</option></select>
+          <button class="primary" id="newBookmark">＋ 添加书签</button>
+        </div>
       </div>
       <div id="activeFilters"></div>
       <section id="list" class="bookmark-grid"></section>
@@ -53,6 +62,7 @@
     <label>标签<input name="tagsText" list="tagNames" placeholder="教程, 待读"></label>
     <datalist id="tagNames"></datalist>
     <label>备注<textarea name="notes" rows="4"></textarea></label>
+    <label class="checkbox-label"><input name="starred" type="checkbox"> 星标书签</label>
     <div class="dialog-actions"><button type="button" data-close="bookmarkDialog">取消</button><button class="primary">保存</button></div>
   </form></dialog>
 

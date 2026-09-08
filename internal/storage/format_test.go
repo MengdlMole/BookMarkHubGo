@@ -10,7 +10,7 @@ import (
 func sampleState() model.State {
 	return model.State{FormatVersion: 1, DeviceID: "mac", Counter: 2,
 		Groups:    []model.Group{{ID: "g-tech", Name: "技术", Revision: "1@mac"}},
-		Bookmarks: []model.Bookmark{{ID: "b-go", URL: "https://go.dev/", Title: "Go 文档", GroupID: "g-tech", Tags: []string{"Go", "教程"}, Notes: "官方文档", CreatedAt: "2026-09-06T10:00:00Z", UpdatedAt: "2026-09-06T11:00:00Z", Revision: "2@mac"}},
+		Bookmarks: []model.Bookmark{{ID: "b-go", URL: "https://go.dev/", Title: "Go 文档", GroupID: "g-tech", Tags: []string{"Go", "教程"}, Notes: "官方文档", Starred: true, CreatedAt: "2026-09-06T10:00:00Z", UpdatedAt: "2026-09-06T11:00:00Z", Revision: "2@mac"}},
 	}
 }
 
@@ -19,14 +19,14 @@ func TestHTMLRoundTripPreservesRichState(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(encoded), "NETSCAPE-Bookmark-file-1") || !strings.Contains(string(encoded), "TAGS=\"Go,教程\"") {
+	if !strings.Contains(string(encoded), "NETSCAPE-Bookmark-file-1") || !strings.Contains(string(encoded), "TAGS=\"Go,教程\"") || !strings.Contains(string(encoded), "DATA-BOOKMARKHUB-STARRED=\"true\"") {
 		t.Fatalf("not browser bookmark HTML: %s", encoded)
 	}
 	decoded, err := DecodeHTML(encoded)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(decoded.Bookmarks) != 1 || decoded.Bookmarks[0].Notes != "官方文档" || decoded.Bookmarks[0].Tags[1] != "教程" {
+	if len(decoded.Bookmarks) != 1 || decoded.Bookmarks[0].Notes != "官方文档" || decoded.Bookmarks[0].Tags[1] != "教程" || !decoded.Bookmarks[0].Starred {
 		t.Fatalf("unexpected round trip: %#v", decoded)
 	}
 }
@@ -40,7 +40,7 @@ func TestXBELRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(decoded.Groups) != 1 || len(decoded.Bookmarks) != 1 || decoded.Bookmarks[0].GroupID != decoded.Groups[0].ID || decoded.Bookmarks[0].Tags[0] != "Go" {
+	if len(decoded.Groups) != 1 || len(decoded.Bookmarks) != 1 || decoded.Bookmarks[0].GroupID != decoded.Groups[0].ID || decoded.Bookmarks[0].Tags[0] != "Go" || !decoded.Bookmarks[0].Starred {
 		t.Fatalf("unexpected XBEL round trip: %#v", decoded)
 	}
 }
