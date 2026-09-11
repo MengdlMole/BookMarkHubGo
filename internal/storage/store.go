@@ -40,6 +40,7 @@ type BookmarkInput struct {
 	Tags      []string `json:"tags"`
 	Notes     string   `json:"notes"`
 	Starred   *bool    `json:"starred,omitempty"`
+	Color     *string  `json:"color,omitempty"`
 }
 
 type GroupInput struct {
@@ -179,6 +180,13 @@ func (s *Store) UpsertBookmark(input BookmarkInput) (model.Bookmark, error) {
 	if parsed, err := url.ParseRequestURI(input.URL); err != nil || (parsed.Scheme != "http" && parsed.Scheme != "https") {
 		return model.Bookmark{}, errors.New("URL must use http or https")
 	}
+	color := ""
+	if input.Color != nil {
+		color = strings.ToLower(strings.TrimSpace(*input.Color))
+		if !validBookmarkColor(color) {
+			return model.Bookmark{}, errors.New("color must be empty, red, orange, yellow, green, cyan, blue, purple, or pink")
+		}
+	}
 	groupID := input.GroupID
 	if input.GroupPath != "" {
 		groupID = s.ensureGroupPath(&state, input.GroupPath)
@@ -192,7 +200,7 @@ func (s *Store) UpsertBookmark(input BookmarkInput) (model.Bookmark, error) {
 	}
 	now := time.Now().UTC().Format(time.RFC3339)
 	state.Counter++
-	bookmark := model.Bookmark{ID: input.ID, URL: input.URL, Title: strings.TrimSpace(input.Title), GroupID: groupID, Tags: model.NormalizeTags(input.Tags), Notes: strings.TrimSpace(input.Notes), UpdatedAt: now, Revision: model.Revision{Counter: state.Counter, DeviceID: s.settings.DeviceID}.String()}
+	bookmark := model.Bookmark{ID: input.ID, URL: input.URL, Title: strings.TrimSpace(input.Title), GroupID: groupID, Tags: model.NormalizeTags(input.Tags), Notes: strings.TrimSpace(input.Notes), Color: color, UpdatedAt: now, Revision: model.Revision{Counter: state.Counter, DeviceID: s.settings.DeviceID}.String()}
 	if input.Starred != nil {
 		bookmark.Starred = *input.Starred
 	}
@@ -208,6 +216,9 @@ func (s *Store) UpsertBookmark(input BookmarkInput) (model.Bookmark, error) {
 		if input.Starred == nil {
 			bookmark.Starred = state.Bookmarks[index].Starred
 		}
+		if input.Color == nil {
+			bookmark.Color = state.Bookmarks[index].Color
+		}
 		state.Bookmarks[index] = bookmark
 	} else {
 		bookmark.CreatedAt = now
@@ -217,6 +228,15 @@ func (s *Store) UpsertBookmark(input BookmarkInput) (model.Bookmark, error) {
 		return model.Bookmark{}, err
 	}
 	return bookmark, nil
+}
+
+func validBookmarkColor(color string) bool {
+	switch color {
+	case "", "red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink":
+		return true
+	default:
+		return false
+	}
 }
 
 func (s *Store) SetBookmarkStar(id string, starred bool) error {
@@ -255,21 +275,66 @@ func (s *Store) UpsertGroup(input GroupInput) (model.Group, error) {
 		if strings.TrimSpace(input.Name) == "" {
 			return errors.New("group name is required")
 		}
-		state.Counter++
-		result = model.Group{ID: input.ID, Name: strings.TrimSpace(input.Name), ParentID: input.ParentID, Order: input.Order, Revision: model.Revision{Counter: state.Counter, DeviceID: s.settings.DeviceID}.String()}
-		if result.ID == "" {
-			result.ID = model.NewID("g")
-		}
+		name := strings.TrimSpace(input.Name)
 		for i := range state.Groups {
-			if state.Groups[i].ID == result.ID {
-				state.Groups[i] = result
-				return nil
+			if state.Groups[i].ID != input.ID {
+				continue
 			}
+			order := state.Groups[i].Order
+			if state.Groups[i].ParentID != input.ParentID {
+				order = nextGroupOrder(state, input.ParentID, input.ID)
+			}
+			state.Counter++
+			result = model.Group{ID: input.ID, Name: name, ParentID: input.ParentID, Order: order, Revision: model.Revision{Counter: state.Counter, DeviceID: s.settings.DeviceID}.String()}
+			state.Groups[i] = result
+			return nil
 		}
+		state.Counter++
+		result = model.Group{ID: model.NewID("g"), Name: name, ParentID: input.ParentID, Order: nextGroupOrder(state, input.ParentID, ""), Revision: model.Revision{Counter: state.Counter, DeviceID: s.settings.DeviceID}.String()}
 		state.Groups = append(state.Groups, result)
 		return nil
 	})
 	return result, err
+}
+
+func (s *Store) ReorderGroups(parentID string, ids []string) error {
+	return s.mutate(func(state *model.State) error {
+		indexes := map[string]int{}
+		for i := range state.Groups {
+			group := state.Groups[i]
+			if !group.Deleted && group.ParentID == parentID {
+				indexes[group.ID] = i
+			}
+		}
+		if len(ids) != len(indexes) {
+			return errors.New("group order must contain every sibling exactly once")
+		}
+		seen := map[string]bool{}
+		for _, id := range ids {
+			index, ok := indexes[id]
+			if !ok || seen[id] {
+				return errors.New("group order contains an unknown or duplicate group")
+			}
+			seen[id] = true
+			if state.Groups[index].Order == len(seen)-1 {
+				continue
+			}
+			state.Counter++
+			state.Groups[index].Order = len(seen) - 1
+			state.Groups[index].Revision = model.Revision{Counter: state.Counter, DeviceID: s.settings.DeviceID}.String()
+		}
+		return nil
+	})
+}
+
+func nextGroupOrder(state *model.State, parentID, excludeID string) int {
+	maxOrder := -1
+	for _, group := range state.Groups {
+		if !group.Deleted && group.ID != excludeID && group.ParentID == parentID && group.Order > maxOrder {
+			maxOrder = group.Order
+		}
+	}
+	return maxOrder + 1
 }
 
 func (s *Store) DeleteGroup(id string) error {

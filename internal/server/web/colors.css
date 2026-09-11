@@ -1,0 +1,28 @@
+.card.has-accent {
+  border-color: var(--bookmark-accent);
+  box-shadow: inset 3px 0 0 var(--bookmark-accent);
+}
+
+.color-button {
+  border: 0;
+  background: transparent;
+  color: var(--bookmark-accent, var(--muted));
+  font-size: 17px;
+  line-height: 1;
+  padding: 2px 5px;
+}
+
+.color-button:hover {
+  border: 0;
+  background: var(--accent-soft);
+}
+
+.bookmark-grid.list-view .card.has-accent {
+  border-left-width: 1px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .card.has-accent {
+    box-shadow: inset 3px 0 0 var(--bookmark-accent), 0 0 0 1px #0003;
+  }
+}

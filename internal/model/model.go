@@ -37,6 +37,7 @@ type Bookmark struct {
 	Tags      []string `json:"tags,omitempty"`
 	Notes     string   `json:"notes,omitempty"`
 	Starred   bool     `json:"starred,omitempty"`
+	Color     string   `json:"color,omitempty"`
 	CreatedAt string   `json:"createdAt"`
 	UpdatedAt string   `json:"updatedAt"`
 	Revision  string   `json:"revision"`

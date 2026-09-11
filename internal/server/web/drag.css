@@ -1,0 +1,33 @@
+.group-tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.drag-handle {
+  width: 16px;
+  color: var(--muted);
+  cursor: grab;
+  font-size: 14px;
+  line-height: 1;
+  opacity: .35;
+  text-align: center;
+  user-select: none;
+}
+
+.group-node:hover .drag-handle,
+.group-node:focus-within .drag-handle {
+  opacity: 1;
+}
+
+.group-node.dragging {
+  opacity: .4;
+}
+
+.group-node.drop-before {
+  box-shadow: inset 0 2px 0 var(--accent);
+}
+
+.group-node.drop-after {
+  box-shadow: inset 0 -2px 0 var(--accent);
+}

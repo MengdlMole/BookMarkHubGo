@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/views.css">
   <link rel="stylesheet" href="/star.css">
+  <link rel="stylesheet" href="/colors.css">
+  <link rel="stylesheet" href="/drag.css">
   <style>.grow{flex:1}</style>
 </head>
 <body>
@@ -62,6 +64,9 @@
     <label>标签<input name="tagsText" list="tagNames" placeholder="教程, 待读"></label>
     <datalist id="tagNames"></datalist>
     <label>备注<textarea name="notes" rows="4"></textarea></label>
+    <label>边框强调色<select name="color">
+      <option value="">无颜色</option><option value="red">红色</option><option value="orange">橙色</option><option value="yellow">黄色</option><option value="green">绿色</option><option value="cyan">青色</option><option value="blue">蓝色</option><option value="purple">紫色</option><option value="pink">粉色</option>
+    </select></label>
     <label class="checkbox-label"><input name="starred" type="checkbox"> 星标书签</label>
     <div class="dialog-actions"><button type="button" data-close="bookmarkDialog">取消</button><button class="primary">保存</button></div>
   </form></dialog>

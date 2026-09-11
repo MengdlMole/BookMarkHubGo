@@ -43,6 +43,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("POST /api/v1/bookmarks/star", s.starBookmark)
 	s.mux.HandleFunc("POST /api/v1/bookmarks/delete", s.deleteBookmark)
 	s.mux.HandleFunc("POST /api/v1/groups", s.upsertGroup)
+	s.mux.HandleFunc("POST /api/v1/groups/reorder", s.reorderGroups)
 	s.mux.HandleFunc("POST /api/v1/groups/delete", s.deleteGroup)
 	s.mux.HandleFunc("POST /api/v1/import", s.importData)
 	s.mux.HandleFunc("GET /api/v1/export", s.exportData)
@@ -153,6 +154,22 @@ func (s *Server) upsertGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, group)
+}
+
+func (s *Server) reorderGroups(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		ParentID string   `json:"parentId"`
+		IDs      []string `json:"ids"`
+	}
+	if err := readJSON(r, &input); err != nil {
+		writeError(w, err)
+		return
+	}
+	if err := s.store.ReorderGroups(input.ParentID, input.IDs); err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
 }
 
 func (s *Server) deleteGroup(w http.ResponseWriter, r *http.Request) {

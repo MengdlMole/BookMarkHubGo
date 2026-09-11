@@ -63,8 +63,8 @@ func writeHTMLLevel(out *bytes.Buffer, state model.State, parentID string, depth
 		}
 		added := unixTime(bookmark.CreatedAt)
 		modified := unixTime(bookmark.UpdatedAt)
-		out.WriteString(fmt.Sprintf("%s<DT><A HREF=\"%s\" ADD_DATE=\"%d\" LAST_MODIFIED=\"%d\" TAGS=\"%s\" DATA-BOOKMARKHUB-ID=\"%s\" DATA-BOOKMARKHUB-REVISION=\"%s\" DATA-BOOKMARKHUB-STARRED=\"%t\">%s</A>\n",
-			indent, attr(bookmark.URL), added, modified, attr(strings.Join(bookmark.Tags, ",")), attr(bookmark.ID), attr(bookmark.Revision), bookmark.Starred, html.EscapeString(bookmark.Title)))
+		out.WriteString(fmt.Sprintf("%s<DT><A HREF=\"%s\" ADD_DATE=\"%d\" LAST_MODIFIED=\"%d\" TAGS=\"%s\" DATA-BOOKMARKHUB-ID=\"%s\" DATA-BOOKMARKHUB-REVISION=\"%s\" DATA-BOOKMARKHUB-STARRED=\"%t\" DATA-BOOKMARKHUB-COLOR=\"%s\">%s</A>\n",
+			indent, attr(bookmark.URL), added, modified, attr(strings.Join(bookmark.Tags, ",")), attr(bookmark.ID), attr(bookmark.Revision), bookmark.Starred, attr(bookmark.Color), html.EscapeString(bookmark.Title)))
 		if bookmark.Notes != "" {
 			out.WriteString(indent + "<DD>" + html.EscapeString(bookmark.Notes) + "\n")
 		}
@@ -183,7 +183,7 @@ func decodeBrowserHTML(content []byte) (model.State, error) {
 					created := parseUnix(current.attrs["add_date"], now)
 					updated := parseUnix(current.attrs["last_modified"], created)
 					starred := current.attrs["data-bookmarkhub-starred"] == "true" || current.attrs["data-bookmarkhub-starred"] == "1"
-					state.Bookmarks = append(state.Bookmarks, model.Bookmark{ID: id, URL: current.attrs["href"], Title: first(text, current.attrs["href"]), GroupID: groupID, Tags: model.NormalizeTags([]string{current.attrs["tags"]}), Starred: starred, CreatedAt: created, UpdatedAt: updated, Revision: revision})
+					state.Bookmarks = append(state.Bookmarks, model.Bookmark{ID: id, URL: current.attrs["href"], Title: first(text, current.attrs["href"]), GroupID: groupID, Tags: model.NormalizeTags([]string{current.attrs["tags"]}), Starred: starred, Color: current.attrs["data-bookmarkhub-color"], CreatedAt: created, UpdatedAt: updated, Revision: revision})
 					lastBookmark = len(state.Bookmarks) - 1
 				case "dd":
 					if lastBookmark >= 0 {
