@@ -21,6 +21,10 @@ try {
     go build -trimpath -ldflags="-s -w" -o (Join-Path $Package $Launcher) ./cmd/bookmarkhub-launcher
     $CurrentJson = @{ version = $Version } | ConvertTo-Json
     [System.IO.File]::WriteAllText((Join-Path $Package "current.json"), $CurrentJson + [Environment]::NewLine, $Utf8NoBom)
+    if ($GoOS -eq "darwin") {
+      Copy-Item (Join-Path $Root "scripts/macos-first-run.command") (Join-Path $Package "macos-first-run.command")
+      Copy-Item (Join-Path $Root "scripts/README-macOS.txt") (Join-Path $Package "README-macOS.txt")
+    }
     Compress-Archive -Path $Package -DestinationPath "$Package.zip"
   }
   $ExtensionPackage = Join-Path $Dist "bookmarkhub-extension-$Version"

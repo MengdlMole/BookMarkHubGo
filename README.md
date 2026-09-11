@@ -152,6 +152,18 @@ dist/bookmarkhub-extension-0.1.0.zip
 
 用户只需解压整个目录并运行 `bookmarkhub` 或 `bookmarkhub.exe`。配置保存在根目录的 `config`，书签同步目录可以指向程序目录外部，因此升级不会覆盖数据。
 
+### macOS 首次运行被拦截
+
+当前开源构建没有使用 Apple Developer ID 签名和公证，从网络下载后可能被 Gatekeeper 拦截。请确认安装包来源可信，然后解压完整目录，在终端执行：
+
+```bash
+sh /完整路径/bookmarkhub-macos-arm64/macos-first-run.command
+```
+
+Apple Silicon（M1/M2/M3/M4 等）选择 `arm64`，Intel Mac 选择 `amd64`。首次运行脚本只恢复本包内二进制的执行权限，并移除它们各自的 `com.apple.quarantine` 属性；不会关闭 Gatekeeper，也不会修改系统全局安全策略。也可以先尝试运行一次，然后按照 Apple 官方方式前往“系统设置 → 隐私与安全性”点击“仍要打开”。
+
+正式对外发布时，推荐使用 Developer ID 对两个 macOS 二进制签名并提交 Apple 公证，从根本上避免此提示。
+
 构建脚本默认输出：
 
 - macOS amd64、arm64
@@ -192,6 +204,7 @@ GET  /api/v1/state
 POST /api/v1/bookmarks
 POST /api/v1/bookmarks/delete
 POST /api/v1/groups
+POST /api/v1/groups/reorder
 POST /api/v1/groups/delete
 POST /api/v1/import
 GET  /api/v1/export?format=html|xbel

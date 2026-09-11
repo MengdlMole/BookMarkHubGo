@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-VERSION="${1:-0.1.0}"
+VERSION="${1:-1.0.2}"
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 DIST="$ROOT/dist"
 
@@ -25,6 +25,11 @@ build_target() {
   CGO_ENABLED=0 GOOS="$target_os" GOARCH="$target_arch" go build -trimpath -ldflags="-s -w -X main.version=$VERSION" -o "$package/versions/$VERSION/$core" ./cmd/bookmarkhub-core
   CGO_ENABLED=0 GOOS="$target_os" GOARCH="$target_arch" go build -trimpath -ldflags="-s -w" -o "$package/$launcher" ./cmd/bookmarkhub-launcher
   printf '{\n  "version": "%s"\n}\n' "$VERSION" > "$package/current.json"
+  if [ "$target_os" = "darwin" ]; then
+    cp "$ROOT/scripts/macos-first-run.command" "$package/macos-first-run.command"
+    cp "$ROOT/scripts/README-macOS.txt" "$package/README-macOS.txt"
+    chmod +x "$package/macos-first-run.command"
+  fi
   if command -v zip >/dev/null 2>&1; then
     (cd "$DIST" && zip -qr "bookmarkhub-$platform-$target_arch.zip" "bookmarkhub-$platform-$target_arch")
   fi
