@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "BookmarkHub Companion",
-  "version": "0.1.0",
+  "version": "1.0.2",
   "description": "将 Chrome 和 Edge 当前页面保存到本地 BookmarkHub。",
   "permissions": ["activeTab", "storage"],
   "host_permissions": ["http://127.0.0.1:17836/*"],

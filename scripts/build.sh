@@ -1,9 +1,20 @@
 #!/usr/bin/env sh
 set -eu
 
-VERSION="${1:-1.0.2}"
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 DIST="$ROOT/dist"
+VERSION="${1:-$(tr -d '[:space:]' < "$ROOT/VERSION")}"
+
+if ! awk -v version="$VERSION" 'BEGIN {
+  count = split(version, parts, ".")
+  if (count < 1 || count > 4) exit 1
+  for (i = 1; i <= count; i++) {
+    if (parts[i] !~ /^(0|[1-9][0-9]*)$/ || parts[i] + 0 > 65535) exit 1
+  }
+}' </dev/null; then
+  echo "Version must contain 1 to 4 dot-separated integers from 0 to 65535, without leading zeros" >&2
+  exit 1
+fi
 
 command -v go >/dev/null 2>&1 || { echo "Go 1.23 or newer is required" >&2; exit 1; }
 rm -rf "$DIST"
@@ -45,8 +56,12 @@ build_target windows arm64
 extension_package="$DIST/bookmarkhub-extension-$VERSION"
 mkdir -p "$extension_package"
 cp -R extension/. "$extension_package/"
+extension_manifest="$extension_package/manifest.json"
+sed "s/\"version\": \"[^\"]*\"/\"version\": \"$VERSION\"/" "$extension_manifest" > "$extension_manifest.tmp"
+mv "$extension_manifest.tmp" "$extension_manifest"
+grep -q "\"version\": \"$VERSION\"" "$extension_manifest" || { echo "Failed to set extension version" >&2; exit 1; }
 if command -v zip >/dev/null 2>&1; then
   (cd "$DIST" && zip -qr "bookmarkhub-extension-$VERSION.zip" "bookmarkhub-extension-$VERSION")
 fi
 
-echo "Portable packages created in $DIST"
+echo "Portable packages version $VERSION created in $DIST"

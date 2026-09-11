@@ -126,13 +126,13 @@ macOS/Linux：
 
 ```bash
 chmod +x scripts/*.sh
-./scripts/build.sh 0.1.0
+./scripts/build.sh 1.0.2
 ```
 
 Windows PowerShell：
 
 ```powershell
-.\scripts\build.ps1 -Version 0.1.0
+.\scripts\build.ps1 -Version 1.0.2
 ```
 
 构建结果示例：
@@ -145,8 +145,10 @@ dist/bookmarkhub-windows-amd64/
     └── 0.1.0/
         └── bookmarkhub-core.exe
 
-dist/bookmarkhub-extension-0.1.0.zip
+dist/bookmarkhub-extension-1.0.2.zip
 ```
+
+未传入版本参数时，两套构建脚本都会读取项目根目录的 `VERSION`。显式传入的版本优先，并同时控制 macOS/Linux/Windows 的 amd64、arm64 版本目录、`current.json`、Core 内嵌版本、扩展目录/ZIP 名称以及扩展 `manifest.json`。扩展版本必须符合 Chrome Manifest 的 1–4 段非负整数格式，每段不超过 65535。
 
 桌面程序与浏览器扩展是两个独立发布包，可分别下载和升级。
 
