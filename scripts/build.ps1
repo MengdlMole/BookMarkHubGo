@@ -33,11 +33,11 @@ try {
   $ExtensionPackage = Join-Path $Dist "bookmarkhub-extension-$Version"
   Copy-Item (Join-Path $Root "extension") $ExtensionPackage -Recurse
   $ExtensionManifestPath = Join-Path $ExtensionPackage "manifest.json"
-  $ExtensionManifest = Get-Content $ExtensionManifestPath -Raw | ConvertFrom-Json
+  $ExtensionManifest = Get-Content $ExtensionManifestPath -Encoding UTF8 -Raw | ConvertFrom-Json
   $ExtensionManifest.version = $Version
   $ExtensionManifestJson = $ExtensionManifest | ConvertTo-Json -Depth 10
   [System.IO.File]::WriteAllText($ExtensionManifestPath, $ExtensionManifestJson + [Environment]::NewLine, $Utf8NoBom)
-  if ((Get-Content $ExtensionManifestPath -Raw | ConvertFrom-Json).version -ne $Version) { throw "Failed to set extension version" }
+  if ((Get-Content $ExtensionManifestPath -Encoding UTF8 -Raw | ConvertFrom-Json).version -ne $Version) { throw "Failed to set extension version" }
   Compress-Archive -Path $ExtensionPackage -DestinationPath "$ExtensionPackage.zip"
   Write-Host "Portable packages version $Version created in $Dist"
 } finally { Pop-Location; Remove-Item Env:GOOS,Env:GOARCH,Env:CGO_ENABLED -ErrorAction SilentlyContinue }
