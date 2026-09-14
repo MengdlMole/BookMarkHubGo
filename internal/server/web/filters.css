@@ -1,0 +1,54 @@
+.section-tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.section-title .section-tools button {
+  padding: 2px 5px;
+  font-size: 11px;
+}
+
+.section-title .section-tools .add-group {
+  padding: 1px 6px;
+  font-size: 18px;
+}
+
+.section-title button:disabled {
+  cursor: default;
+  opacity: .4;
+}
+
+.filter.removable {
+  display: inline-flex;
+  align-items: center;
+}
+
+.filter-remove {
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: currentColor;
+  font-size: 14px;
+  line-height: 14px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.filter.removable:hover .filter-remove,
+.filter-remove:focus-visible {
+  background: #315efb18;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: none) {
+  .filter-remove {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

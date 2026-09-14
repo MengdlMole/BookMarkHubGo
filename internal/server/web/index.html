@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/star.css">
   <link rel="stylesheet" href="/colors.css">
   <link rel="stylesheet" href="/drag.css">
+  <link rel="stylesheet" href="/filters.css">
   <style>.grow{flex:1}</style>
 </head>
 <body>
@@ -28,7 +29,7 @@
   <div class="layout">
     <aside>
       <section>
-        <div class="section-title"><span>分组</span><button id="newGroup" title="新建分组">＋</button></div>
+        <div class="section-title"><span>分组</span><span class="section-tools"><button id="expandAllGroups" title="全部展开">展开</button><button id="collapseAllGroups" title="全部折叠">折叠</button><button id="newGroup" class="add-group" title="新建分组">＋</button></span></div>
         <nav id="groups"></nav>
       </section>
       <section>
