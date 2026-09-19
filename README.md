@@ -177,8 +177,7 @@ Apple Silicon（M1/M2/M3/M4 等）选择 `arm64`，Intel Mac 选择 `amd64`。�
 创建升级包：
 
 ```bash
-./scripts/make-update.sh 0.2.0 windows amd64 \
-  ./bookmarkhub-core.exe ./bookmarkhub-update-0.2.0-windows-amd64.zip
+./scripts/make-update.sh 0.2.0 windows amd64 ./bookmarkhub-core.exe ./bookmarkhub-update-0.2.0-windows-amd64.zip
 ```
 
 关闭正在运行的 Core，然后执行：
